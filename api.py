@@ -15,7 +15,7 @@ from flask import Flask, request, g
 from flask_restful import Api
 from flask_apscheduler import APScheduler
 
-from constants import POSTGRES_LOCATION, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, DEBUG
+from constants import POSTGRES_LOCATION, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
 from database import db
 
 from DataBroker.tos_reader import tos_reader, sector_reader, calendar_reader
@@ -159,4 +159,4 @@ def addCalendar_Reader(scheduler, delay):
         run_date=scheduled_time)
     logger.info('Calendar Reader Job Added')
 
-app = create_app(f"postgresql://{POSTGRES_LOCATION}/{POSTGRES_DB}",DEBUG)
+app = create_app(f"postgresql://{POSTGRES_LOCATION}/{POSTGRES_DB}",False)
