@@ -31,7 +31,7 @@ class tosScannerReader:
         # Connect to Postgres
         self.db = databaseHandler(self.postgres)
         self.startTime = time.time()
-        caller = inspect.stack()[1][3]
+        caller = inspect.stack()[1][3].upper()
         
         # Create New Run in RunHistory
         self.db.cur.execute('''
@@ -88,7 +88,7 @@ class tosScannerReader:
                 "SymbolsInsert"=0,
             WHERE "Id"=%s
         ''' % (self.endTime,self.runId))
-        
+
         self.log.info(f'Ending Run at: {self.endTime}')
         self.log.info(f'Runtime: {self.endTime-self.startTime}')
         self.db.exit()    
