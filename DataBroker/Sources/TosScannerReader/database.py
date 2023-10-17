@@ -9,6 +9,7 @@ import csv
 import datetime
 import time
 import glob
+import pytz
 import pandas as pd
 import numpy as np
 import locale
@@ -16,6 +17,7 @@ from io import StringIO
 from sqlalchemy import create_engine
 from pyparsing import Regex
 
+est = pytz.timezone('US/Eastern')
 logger = logging.getLogger(__name__)
 class databaseHandler:
     def __init__(self,params_dic={}):
@@ -42,7 +44,8 @@ class databaseHandler:
             "Symbol",
         ]
         self.int_list = [
-            "Month"
+            "Month",
+            "Year"
         ]
         self.bigint_list = [
             "Volume",
@@ -171,8 +174,11 @@ class databaseHandler:
             if (notExcluded):
                 if col in self.symbol_list:
                     res += "%s," % '"{}"'.format(col)
-                elif col in self.uniqueSymbol_list and unique:
-                    res += "%s," % '"{}"'.format(col)
+                elif (col in self.uniqueSymbol_list):
+                    if unique:
+                        res += "%s," % '"{}"'.format(col)
+                    else:
+                        res += ""
                 elif col in self.name_list :
                     res += "%s," % '"{}"'.format(col)
                 elif col in self.char_list:
@@ -180,7 +186,7 @@ class databaseHandler:
                 elif col in self.chartwo_list:
                     res += "%s," % '"{}"'.format(col)
                 elif col in self.int_list:
-                    res += "%s int," % '"{}"'.format(col)
+                    res += "%s," % '"{}"'.format(col)
                 elif col in self.bigint_list:
                     res += "%s," % '"{}"'.format(col)
                 elif col in self.date_list:
@@ -215,8 +221,8 @@ class databaseHandler:
             if (notExcluded):
                 if col in self.symbol_list:
                     res += "excluded.%s," % '"{}"'.format(col)
-                elif col in self.uniqueSymbol_list and unique:
-                    res += "excluded.%s," % '"{}"'.format(col)
+                elif col in self.uniqueSymbol_list:
+                    res += ""
                 elif col in self.name_list :
                     res += "excluded.%s," % '"{}"'.format(col)
                 elif col in self.char_list:
@@ -224,7 +230,7 @@ class databaseHandler:
                 elif col in self.chartwo_list:
                     res += "excluded.%s," % '"{}"'.format(col)
                 elif col in self.int_list:
-                    res += "%s int," % '"{}"'.format(col)
+                    res += "excluded.%s," % '"{}"'.format(col)
                 elif col in self.bigint_list:
                     res += "excluded.%s," % '"{}"'.format(col)
                 elif col in self.date_list:
@@ -339,6 +345,7 @@ class databaseHandler:
         if table is not None:
             self.csv_cols = self.getColNamesDataTypes(panda,addlCols=addlCols,constraints=constraints)
             sqlCom = "CREATE TABLE IF NOT EXISTS %s %s" % (table,self.csv_cols)
+            sqlCom = sqlCom.replace(" primary key,",",")
             self.logger.info("Creating %s" % table)
             self.logger.debug(sqlCom)
             try:
@@ -496,11 +503,8 @@ class databaseHandler:
             if table == 'calendar_TdScan':
                 insert_sql = f'''
                 INSERT INTO {table} {colNames} \
-                    VALUES %s \
-                    ON CONFLICT ON CONSTRAINT uniqueevents DO UPDATE SET \
-                    {self.colNamesNoPK} = {self.excludedColNames};
+                    VALUES %s ;
             '''
-            self.logger.debug(insert_sql)
         try:
             psycopg2.extras.execute_values(self.cur, insert_sql, tuples)
             self.conn.commit()
@@ -509,8 +513,8 @@ class databaseHandler:
             print("Error: %s" % error)
             self.logger.error(error)
             self.conn.rollback()
-            self.logger.info('\n\n\n')
-            self.logger.info(insert_sql)
+            self.logger.error('\n\n\n')
+            self.logger.error(insert_sql % tuples)
             return 1
         print("execute_values() done")
         return 0
@@ -544,10 +548,11 @@ class databaseHandler:
                     panda[col] = panda[col].replace(["<empty>"],[np.nan], regex=True)
                     panda[col].astype(str)
                     formatColumns[col] = str
-                elif col in self.uniqueSymbol_list and unique:
-                    panda[col] = panda[col].replace(["<empty>"],[np.nan], regex=True)
-                    panda[col].astype(str)
-                    formatColumns[col] = str
+                elif col in self.uniqueSymbol_list:
+                    if unique:
+                        panda[col] = panda[col].replace(["<empty>"],[np.nan], regex=True)
+                        panda[col].astype(str)
+                        formatColumns[col] = str
                 elif col in self.name_list:
                     panda[col] = panda[col].replace(["<empty>","'"],[np.nan,""], regex=True)
                     if col == "Sector" and len(sector) > 0:
@@ -563,7 +568,9 @@ class databaseHandler:
                     panda[col].astype(str)
                     formatColumns[col] = str
                 elif col in self.int_list:
-                    res += "%s int," % '"{}"'.format(col)
+                    panda[col] = panda[col].replace(["<empty>",","],[0,""], regex=True)
+                    panda[col] = panda[col].replace(["K","M"],["*1e3","*1e6"], regex=True).map(pd.eval).astype(int)
+                    formatColumns[col] = int
                 elif col in self.bigint_list:
                     panda[col] = panda[col].replace(["<empty>",","],[0,""], regex=True)
                     panda[col] = panda[col].replace(["K","M"],["*1e3","*1e6"], regex=True).map(pd.eval).astype(np.int64)
@@ -719,10 +726,32 @@ class databaseHandler:
 
         df = self.cleanCalendarCsv(eventsByMonth)
         df['Month'] = df['Time'].dt.month
-        self.createTable(df,tableName,['"Updated" DATE default now()','"Scanned" DATE','"Added" DATE default now()' ],constraints='constraint uniqueEvents UNIQUE ("Time","Symbol","Description")')
-        df["Updated"] = datetime.date.fromtimestamp(time.time())
-        df["Scanned"] = datetime.datetime.strptime(scanDate,'%Y-%m-%d')
-        suc = self.execute_values(df,tableName)
+        df['Year'] = df['Time'].dt.year
+
+        self.createTable(df,tableName,['"Updated" DATE default now()','"Scanned" DATE','"Added" DATE default now()' ]) #,constraints='constraint uniqueEvents UNIQUE ("Month","Symbol","Event")')
+
+        nycDate = est.localize(datetime.datetime.utcnow()).strftime('%Y-%m-%d')
+        endDate = (est.localize(datetime.datetime.utcnow()) + datetime.timedelta(31)).strftime('%Y-%m-%d')
+        self.logger.info(f'NYC Start Date {nycDate}    NYC End Date: {endDate}')
+
+        futureEvents = df.loc[(df['Time']>=nycDate)]
+        futureEvents = futureEvents.loc[(futureEvents['Time']<endDate)]
+
+        df["Scanned"] = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        df["Time"] = df["Time"].dt.strftime('%Y-%m-%d %H:%M:%S')
+        self.cur.execute('SELECT COUNT("Symbol") FROM calendar_TdScan;')
+        alreadyInDb = self.cur.fetchone()[0]
+        self.conn.commit()
+        if alreadyInDb == 0:
+            suc = self.execute_values(df,tableName)
+            self.conn.commit()
+
+        self.cur.execute(f'DELETE FROM calendar_TdScan WHERE "Time" >= \'{nycDate}\' and "Time" < \'{endDate}\'')
+        self.conn.commit()
+        
+        futureEvents["Time"] = futureEvents["Time"].dt.strftime('%Y-%m-%d %H:%M:%S')
+        suc = self.execute_values(futureEvents,tableName)
+        self.conn.commit()
         return suc
 
 def print_psycopg2_exception(err):
@@ -736,12 +765,12 @@ def print_psycopg2_exception(err):
     line_num = traceback.tb_lineno
 
     # print the connect() error
-    print ("\npsycopg2 ERROR:", err, "on line number:", line_num)
-    print ("psycopg2 traceback:", traceback, "-- type:", err_type)
+    logger.error("\npsycopg2 ERROR:", err, "on line number:", line_num)
+    logger.error("psycopg2 traceback:", traceback, "-- type:", err_type)
 
     # psycopg2 extensions.Diagnostics object attribute
-    print ("\nextensions.Diagnostics:", err.diag)
+    logger.error("\nextensions.Diagnostics:", err.diag)
 
     # print the pgcode and pgerror exceptions
-    print ("pgerror:", err.pgerror)
-    print ("pgcode:", err.pgcode, "\n")
+    logger.error("pgerror:", err.pgerror)
+    logger.error("pgcode:", err.pgcode, "\n")
