@@ -38,6 +38,7 @@ class tosScannerReader:
             INSERT INTO PUBLIC.financedb_RUNHISTORY ("Process","Startime","SymbolsToFetch") VALUES ('%s','%s',0) RETURNING "Id";
         ''' % (caller,self.startTime))
         self.runId = self.db.cur.fetchone()[0]
+        self.db.conn.commit()
 
         self.log.info(f'')
         self.log.info(f'')
@@ -88,6 +89,7 @@ class tosScannerReader:
                 "SymbolsInsert"=0
             WHERE "Id"=%s
         ''' % (self.endTime,self.runId))
+        self.db.conn.commit()
 
         self.log.info(f'Ending Run at: {self.endTime}')
         self.log.info(f'Runtime: {self.endTime-self.startTime}')
