@@ -85,7 +85,7 @@ class tosScannerReader:
         self.db.cur.execute('''
             UPDATE PUBLIC.financedb_RUNHISTORY
             SET "Endtime"=%s,
-                "SymbolsInsert"=0,
+                "SymbolsInsert"=0
             WHERE "Id"=%s
         ''' % (self.endTime,self.runId))
 
