@@ -3,10 +3,11 @@ FROM python:3.9.13-buster
 ENV POWERAUTO_PWD "autopass"
 
 RUN    useradd -ms /bin/bash powerauto
+RUN    touch /DataBroker/Sources/TosScannerReader/data/
 RUN    echo powerauto:${POWERAUTO_PWD} | chpasswd
 WORKDIR /var/www/tdScannerReader
 
-RUN    apt-get update
+#RUN    apt-get update
 
 ADD    --chown=powerauto:powerauto /DataBroker/Sources/TosScannerReader/data/ /home/powerauto/data/
 
