@@ -6,11 +6,12 @@ RUN    useradd -ms /bin/bash powerauto
 RUN    echo powerauto:${POWERAUTO_PWD} | chpasswd
 WORKDIR /var/www/tdScannerReader
 
-#RUN    apt-get update
+RUN    apt-get update
 
 #ADD    --chown=powerauto:powerauto /DataBroker/Sources/TosScannerReader/data/ /home/powerauto/data/
 
 RUN    mkdir /home/powerauto/data/
+RUN    chown powerauto:powerauto /home/powerauto/data/
 
 RUN    echo y | apt-get install unixodbc unixodbc-dev
 RUN    echo y | apt-get install locales
