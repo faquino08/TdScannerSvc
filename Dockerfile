@@ -3,7 +3,7 @@ FROM python:3.9.13-buster
 ENV POWERAUTO_PWD "autopass"
 
 RUN    useradd -ms /bin/bash powerauto
-RUN    touch /DataBroker/Sources/TosScannerReader/data/
+RUN    mkdir /DataBroker/Sources/TosScannerReader/data/
 RUN    echo powerauto:${POWERAUTO_PWD} | chpasswd
 WORKDIR /var/www/tdScannerReader
 
