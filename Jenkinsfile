@@ -1,9 +1,6 @@
 node {
     def app
-
-    environment {
-        PROJECT_NAME = 'tdscannerreader'
-    }
+    PROJECT_NAME = 'tdscannerreader'
 
     stage('Initialize'){
         def dockerHome = tool 'myDocker'
@@ -20,7 +17,7 @@ node {
         /* This builds the actual image; synonymous to
         * docker build on the command line */
 
-        app = docker.build("sofraserv/${env.PROJECT_NAME}:${env.BUILD_NUMBER}")
+        app = docker.build("sofraserv/${PROJECT_NAME}:${env.BUILD_NUMBER}")
     }
 
     stage('Push image') {
