@@ -1,7 +1,6 @@
 import logging
 import inspect
 import time
-from datetime import date, datetime
 
 from DataBroker.Sources.TosScannerReader.database import databaseHandler
 

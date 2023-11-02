@@ -1,18 +1,15 @@
 import logging
 import requests
-from statistics import median_grouped
 import sys
 import datetime
 import pytz
 from os import path, environ
 from urllib import request
 import json
-import argparse
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from flask import Flask, request, g
-from flask_restful import Api
+from flask import Flask, request
 from flask_apscheduler import APScheduler
 
 from constants import POSTGRES_LOCATION, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, DEBUG
@@ -21,9 +18,7 @@ from database import db
 from DataBroker.tos_reader import tos_reader, sector_reader, calendar_reader
 
 # Custom Convert
-import werkzeug
 from werkzeug.routing import PathConverter
-from packaging import version
 
 class EverythingConverter(PathConverter):
     regex = '.*?'
