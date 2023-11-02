@@ -1,9 +1,6 @@
 node {
     def app
-
-    environment {
-        PROJECT_NAME = 'tdscannerreader'
-    }
+    def PROJECT_NAME = 'tdscannerreader'
 
     stage('Initialize'){
         def dockerHome = tool 'myDocker'
