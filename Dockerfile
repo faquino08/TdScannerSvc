@@ -6,7 +6,6 @@ RUN    useradd -ms /bin/bash powerauto
 RUN    echo powerauto:${POWERAUTO_PWD} | chpasswd
 WORKDIR /var/www/tdScannerReader
 RUN    mkdir /var/www/tdScannerReader/logs
-RUN    mkdir /var/www/tdScannerReader/DataBroker/Sources/TosScannerReader/data
 
 ADD    --chown=powerauto:powerauto /DataBroker/Sources/TosScannerReader/data/ /home/powerauto/data/
 
@@ -45,6 +44,7 @@ COPY   requirements.txt requirements.txt
 RUN    pip3 install -r requirements.txt
 
 COPY   . /var/www/tdScannerReader
+RUN    mkdir /var/www/tdScannerReader/DataBroker/Sources/TosScannerReader/data
 
 ADD start.sh /var/www/tdScannerReader/start.sh
 RUN chmod +x /var/www/tdScannerReader/start.sh
