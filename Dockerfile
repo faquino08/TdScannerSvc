@@ -10,7 +10,7 @@ RUN    mkdir -p /home/powerauto/data && chown powerauto /home/powerauto/data/ &&
 
 #ADD    --chown=powerauto:powerauto /DataBroker/Sources/TosScannerReader/data/ /home/powerauto/data/
 
-RUN    echo y | apt-get install vsftpd
+#RUN    echo y | apt-get install vsftpd
 RUN    sed -i "s|listen_ipv6=YES|listen_ipv6=NO|g" /etc/vsftpd.conf
 RUN    sed -i "s|listen=NO|listen=YES|g" /etc/vsftpd.conf
 RUN    sed -i "s|local_enable=NO|local_enable=YES|g" /etc/vsftpd.conf
