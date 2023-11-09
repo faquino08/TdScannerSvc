@@ -6,6 +6,7 @@ RUN    useradd -ms /bin/bash powerauto
 RUN    echo powerauto:${POWERAUTO_PWD} | chpasswd
 WORKDIR /var/www/tdScannerReader
 RUN    mkdir /var/www/tdScannerReader/logs
+RUN    mkdir /var/www/tdScannerReader/DataBroker/Sources/TosScannerReader/data
 
 ADD    --chown=powerauto:powerauto /DataBroker/Sources/TosScannerReader/data/ /home/powerauto/data/
 
