@@ -2,7 +2,7 @@
 
 Flask app that creates an ftp server and exposes an api for reading watchlists exported as `.csv` files and inserting the data into the postgres database.
 
-<div align="center"><a href="https://github.com/faquino08/FinanceDb/blob/main/README.md">Main Repo of Services</a></div>
+[Main Repo](https://github.com/faquino08/FinanceDb/blob/main/README.md)
 
 # Docker Reference
 
