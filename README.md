@@ -7,11 +7,11 @@ Flask app that creates an ftp server and exposes an api for reading watchlists e
 The following is a description of each env var key and value:
 
 **Key Name:** PROJECT_ROOT \
-**Description:** **(DEPRECATED)** a string containing the authentication information for the postgres server. DO NOT INCLUDE DATABASE NAME. \
+**Description:** :warning: DEPRECATED :warning: a string containing the authentication information for the postgres server. DO NOT INCLUDE DATABASE NAME. \
 **Values:** <span style="color:#6C8EEF">user:password@host:port</span>
 
 **Key Name:** POSTGRES_DB \
-**Description:** **(DEPRECATED)** a string containing the name of the postgres database for data insertion. \
+**Description:** a string containing the name of the postgres database for data insertion. \
 **Values:** <span style="color:#6C8EEF">\<postgres database name string></span>
 
 **Key Name:** POSTGRES_USER \
