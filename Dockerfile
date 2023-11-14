@@ -8,24 +8,6 @@ WORKDIR /var/www/tdScannerReader
 RUN    mkdir /var/www/tdScannerReader/logs
 RUN    mkdir -p /home/powerauto/data && chown powerauto /home/powerauto/data/ && chgrp powerauto /home/powerauto/data/
 
-#ADD    --chown=powerauto:powerauto /DataBroker/Sources/TosScannerReader/data/ /home/powerauto/data/
-
-#RUN    echo y | apt-get install vsftpd
-RUN    sed -i "s|listen_ipv6=YES|listen_ipv6=NO|g" /etc/vsftpd.conf
-RUN    sed -i "s|listen=NO|listen=YES|g" /etc/vsftpd.conf
-RUN    sed -i "s|local_enable=NO|local_enable=YES|g" /etc/vsftpd.conf
-RUN    sed -i "s|xferlog_enable=NO|xferlog_enable=YES|g" /etc/vsftpd.conf
-RUN    sed -i "s|#write_enable=YES|write_enable=YES|g" /etc/vsftpd.conf
-
-RUN    echo "local_root=/home/powerauto/data" >> /etc/vsftpd.conf
-RUN    echo "pasv_enable=YES" >> /etc/vsftpd.conf
-RUN    echo "pasv_min_port=30090" >> /etc/vsftpd.conf
-RUN    echo "pasv_max_port=30100" >> /etc/vsftpd.conf
-RUN    echo "pasv_promiscuous=YES" >> /etc/vsftpd.conf
-RUN    echo "chroot_local_user=YES" >> /etc/vsftpd.conf
-RUN    echo "allow_writeable_chroot=YES" >> /etc/vsftpd.conf
-RUN    echo "listen_port=30021" >> /etc/vsftpd.conf
-
 EXPOSE 21/tcp
 EXPOSE 22/tcp
 EXPOSE 10090/tcp
