@@ -590,7 +590,7 @@ class databaseHandler:
                                 cents = (float(cents)/10)/32
                             else:
                                 cents = (float(cents))/32
-                            panda[col][index] = dollars + cents
+                            panda.at[index,col] = dollars + cents
                         
                     panda[col].astype(float)
                     formatColumns[col] = float
