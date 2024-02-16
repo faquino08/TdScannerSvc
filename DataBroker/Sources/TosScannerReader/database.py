@@ -318,7 +318,7 @@ class databaseHandler:
         else:
             raise Exception("Need to provide table for execute_mogrify.")
 
-    def createTable(self,panda=pd.DataFrame(),table=None,addlCols=[],drop=False,constraints=''):
+    def createTable(self,panda=pd.DataFrame(),table=None,addlCols=[],drop=False,constraints='',unique=False):
         '''
         Create new empty table based on columns in Dataframes.
         panda       -> (Dataframe) Data to insert in Postgres
@@ -341,7 +341,8 @@ class databaseHandler:
         if table is not None:
             self.csv_cols = self.getColNamesDataTypes(panda,addlCols=addlCols,constraints=constraints)
             sqlCom = "CREATE TABLE IF NOT EXISTS %s %s" % (table,self.csv_cols)
-            sqlCom = sqlCom.replace(" primary key,",",")
+            if unique:
+                sqlCom = sqlCom.replace(" primary key,",",")
             self.logger.info("Creating %s" % table)
             self.logger.debug(sqlCom)
             try:
