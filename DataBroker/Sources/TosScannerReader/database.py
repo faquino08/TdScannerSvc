@@ -639,7 +639,7 @@ class databaseHandler:
         tableName += '_TdScan'
         self.tableNames.append(tableName)
 
-        self.createTable(df,tableName,['"Updated" DATE default now()','"Scanned" DATE','"Added" DATE default now()' ])
+        self.createTable(df,tableName,['"Updated" DATE default now()','"Scanned" DATE','"Added" DATE default now()' ],unique=True)
         df["Updated"] = datetime.date.fromtimestamp(time.time())
         df["Scanned"] = datetime.datetime.strptime(scanDate,'%Y-%m-%d')
         df = self.cleanCsv(df)
@@ -666,7 +666,7 @@ class databaseHandler:
         tableName = "sectors_TdScan"
         self.tableNames.append(tableName)
 
-        self.createTable(df,tableName,['"Updated" DATE default now()','"Scanned" DATE','"Added" DATE default now()' ])
+        self.createTable(df,tableName,['"Updated" DATE default now()','"Scanned" DATE','"Added" DATE default now()' ],unique=True)
         df["Updated"] = datetime.date.fromtimestamp(time.time())
         df["Scanned"] = datetime.datetime.strptime(scanDate,'%Y-%m-%d')
         df = self.cleanCsv(df,sector=sector)
@@ -725,7 +725,7 @@ class databaseHandler:
         df['Month'] = df['Time'].dt.month
         df['Year'] = df['Time'].dt.year
 
-        self.createTable(df,tableName,['"Updated" DATE default now()','"Scanned" DATE','"Added" DATE default now()' ]) #,constraints='constraint uniqueEvents UNIQUE ("Month","Symbol","Event")')
+        self.createTable(df,tableName,['"Updated" DATE default now()','"Scanned" DATE','"Added" DATE default now()' ],unique=True) #,constraints='constraint uniqueEvents UNIQUE ("Month","Symbol","Event")')
 
         nycDate = est.localize(datetime.datetime.utcnow()).strftime('%Y-%m-%d')
         endDate = (est.localize(datetime.datetime.utcnow()) + datetime.timedelta(31)).strftime('%Y-%m-%d')
